@@ -1,0 +1,766 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLOCK BLAST | Daffa Apriadi Putra</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top,#263d68,#10172c 70%);
+  font-family: Arial,sans-serif;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.game {
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+
+.creator {
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: #54e7ff;
+  font-weight: bold;
+  margin-bottom: 13px;
+  text-shadow: 0 0 15px #54e7ff;
+}
+
+h1 {
+  font-size: 38px;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg,#48eaff,#a17bff);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #aab8d8;
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-bottom: 22px;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.stat {
+  flex: 1;
+  background: #263858;
+  border: 1px solid #435c85;
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.stat span {
+  display: block;
+  font-size: 12px;
+  color: #aab8d8;
+  margin-bottom: 7px;
+}
+
+.stat strong {
+  font-size: 27px;
+  color: #50e5ff;
+}
+
+.board {
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(8,1fr);
+  gap: 5px;
+  padding: 8px;
+  background: #152440;
+  border: 2px solid #405b87;
+  border-radius: 17px;
+  box-shadow: 0 10px 35px #0006;
+}
+
+.cell {
+  background: #30415f;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: .15s;
+}
+
+.cell.filled {
+  background: var(--color);
+  border: 1px solid #ffffff55;
+  box-shadow: inset 0 -4px 0 #0003;
+  animation: appear .2s;
+}
+
+@keyframes appear {
+  from { transform: scale(.6); }
+  to { transform: scale(1); }
+}
+
+.section-title {
+  margin: 22px 0 12px;
+  color: #b7c7e6;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.pieces {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  min-height: 110px;
+}
+
+.piece {
+  width: 110px;
+  height: 105px;
+  background: #263858;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.piece.selected {
+  border-color: #50e5ff;
+  background: #354d75;
+  box-shadow: 0 0 15px #50e5ff55;
+  transform: translateY(-4px);
+}
+
+.piece.used {
+  opacity: .12;
+  pointer-events: none;
+}
+
+.mini {
+  display: grid;
+  gap: 3px;
+}
+
+.mini-cell {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.message {
+  min-height: 35px;
+  color: #aab8d8;
+  font-size: 13px;
+  margin-top: 15px;
+  line-height: 1.5;
+}
+
+button {
+  background: linear-gradient(90deg,#50e5ff,#a17bff);
+  color: #10172c;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 30px;
+  cursor: pointer;
+  font-size: 15px;
+  margin-top: 12px;
+  transition: .2s;
+}
+
+button:hover {
+  transform: scale(1.04);
+}
+
+button:active {
+  transform: scale(.96);
+}
+
+.footer {
+  margin-top: 22px;
+  color: #7486a8;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #080e20eF;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 10;
+}
+
+.overlay.show {
+  display: flex;
+}
+
+.modal {
+  background: linear-gradient(145deg,#263d65,#172541);
+  border: 1px solid #50e5ff;
+  width: 100%;
+  max-width: 340px;
+  padding: 30px 23px;
+  border-radius: 22px;
+  box-shadow: 0 0 35px #50e5ff22;
+  animation: appear .3s;
+}
+
+.modal h2 {
+  color: #50e5ff;
+  font-size: 30px;
+  margin-bottom: 15px;
+}
+
+.modal p {
+  color: #d2def3;
+  margin: 12px 0;
+  line-height: 1.7;
+}
+
+.thanks {
+  color: #50e5ff !important;
+  font-weight: bold;
+  font-size: 14px;
+  margin-top: 20px !important;
+}
+
+@media(max-width:360px) {
+  .board { gap: 3px; padding: 5px; }
+  .piece { width: 90px; }
+  .cell { border-radius: 3px; }
+  h1 { font-size: 31px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+  <p class="creator">DAFFA APRIADI PUTRA</p>
+
+  <h1>BLOCK BLAST</h1>
+
+  <p class="subtitle">
+    PUZZLE GAME • DAFFA EDITION
+  </p>
+
+  <div class="stats">
+    <div class="stat">
+      <span>YOUR SCORE</span>
+      <strong id="score">0</strong>
+    </div>
+
+    <div class="stat">
+      <span>BEST SCORE</span>
+      <strong id="best">0</strong>
+    </div>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <p class="section-title">
+    SELECT YOUR BLOCK
+  </p>
+
+  <div class="pieces" id="pieces"></div>
+
+  <div class="message" id="message">
+    Pilih balok dan susun di papan!
+  </div>
+
+  <button onclick="restart()">
+    ↻ RESTART GAME
+  </button>
+
+  <div class="footer">
+    CREATED BY DAFFA APRIADI PUTRA © 2026
+  </div>
+
+</div>
+
+<div class="overlay" id="overlay">
+
+  <div class="modal">
+
+    <h2>GAME OVER!</h2>
+
+    <p>Permainan kamu sudah selesai.</p>
+
+    <p>
+      TOTAL SCORE:
+      <strong id="finalScore" style="color:#50e5ff">
+        0
+      </strong>
+    </p>
+
+    <p class="thanks">
+      Terimakasih sudah mencoba game web buatan saya.
+    </p>
+
+    <p style="font-size:12px;color:#9eafd0">
+      Created by Daffa Apriadi Putra
+    </p>
+
+    <button onclick="restart()">
+      MAIN LAGI
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+const SIZE = 8;
+
+let board = [];
+let score = 0;
+
+let best = Number(
+  localStorage.getItem("daffaBlockBest") || 0
+);
+
+let pieces = [];
+let selected = -1;
+
+const boardElement =
+  document.getElementById("board");
+
+const piecesElement =
+  document.getElementById("pieces");
+
+const colors = [
+  "#ff5c75",
+  "#42d9ff",
+  "#a477ff",
+  "#ffd34e",
+  "#52e6a0",
+  "#ff974f"
+];
+
+const shapes = [
+  [[1]],
+  [[1,1]],
+  [[1,1,1]],
+  [[1,1,1,1]],
+  [[1,1,1,1,1]],
+  [[1,1],[1,1]],
+  [[1,0],[1,1]],
+  [[0,1],[1,1]],
+  [[1,1],[1,0]],
+  [[1,0],[1,0],[1,1]],
+  [[0,1],[0,1],[1,1]],
+  [[1,1,1],[0,1,0]],
+  [[1,1,1],[1,0,0]],
+  [[1,1],[1,0],[1,0]],
+  [[1,1,1],[1,1,1]],
+  [[1,0,0],[1,1,1]]
+];
+
+function randomColor() {
+  return colors[
+    Math.floor(Math.random()*colors.length)
+  ];
+}
+
+function newBoard() {
+  board = Array.from(
+    {length:SIZE},
+    () => Array(SIZE).fill(null)
+  );
+}
+
+function renderBoard() {
+
+  boardElement.innerHTML = "";
+
+  for(let r=0;r<SIZE;r++) {
+
+    for(let c=0;c<SIZE;c++) {
+
+      const cell = document.createElement("div");
+
+      cell.className = "cell";
+
+      if(board[r][c]) {
+
+        cell.classList.add("filled");
+
+        cell.style.setProperty(
+          "--color",
+          board[r][c]
+        );
+
+      }
+
+      cell.onclick = () => placePiece(r,c);
+
+      boardElement.appendChild(cell);
+
+    }
+
+  }
+
+}
+
+function createPiece() {
+
+  const shape =
+    shapes[Math.floor(Math.random()*shapes.length)];
+
+  return {
+    shape: shape.map(row=>[...row]),
+    color: randomColor()
+  };
+
+}
+
+function newPieces() {
+
+  pieces = [
+    createPiece(),
+    createPiece(),
+    createPiece()
+  ];
+
+  selected = -1;
+
+  renderPieces();
+
+}
+
+function renderPieces() {
+
+  piecesElement.innerHTML = "";
+
+  pieces.forEach((piece,index)=>{
+
+    const box = document.createElement("div");
+
+    box.className = "piece";
+
+    if(!piece) {
+
+      box.classList.add("used");
+
+      piecesElement.appendChild(box);
+
+      return;
+
+    }
+
+    if(selected===index) {
+
+      box.classList.add("selected");
+
+    }
+
+    const mini = document.createElement("div");
+
+    mini.className = "mini";
+
+    mini.style.gridTemplateColumns =
+      `repeat(${piece.shape[0].length},18px)`;
+
+    piece.shape.forEach(row=>{
+
+      row.forEach(value=>{
+
+        const cell = document.createElement("div");
+
+        cell.className = "mini-cell";
+
+        if(value) {
+
+          cell.style.background = piece.color;
+
+          cell.style.boxShadow =
+            "inset 0 -3px #0003";
+
+        }
+
+        mini.appendChild(cell);
+
+      });
+
+    });
+
+    box.appendChild(mini);
+
+    box.onclick = ()=>{
+
+      selected = index;
+
+      renderPieces();
+
+      document.getElementById("message").textContent =
+        "Balok dipilih! Sekarang pilih lokasi.";
+
+    };
+
+    piecesElement.appendChild(box);
+
+  });
+
+}
+
+function canPlace(shape,r,c) {
+
+  for(let y=0;y<shape.length;y++) {
+
+    for(let x=0;x<shape[y].length;x++) {
+
+      if(shape[y][x]) {
+
+        const nr = r+y;
+        const nc = c+x;
+
+        if(
+          nr>=SIZE ||
+          nc>=SIZE ||
+          board[nr][nc]!==null
+        ) {
+
+          return false;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  return true;
+
+}
+
+function placePiece(r,c) {
+
+  if(selected===-1 || !pieces[selected]) {
+
+    document.getElementById("message").textContent =
+      "Pilih balok terlebih dahulu!";
+
+    return;
+
+  }
+
+  const piece = pieces[selected];
+
+  if(!canPlace(piece.shape,r,c)) {
+
+    document.getElementById("message").textContent =
+      "Tempat tersebut tidak bisa digunakan!";
+
+    return;
+
+  }
+
+  for(let y=0;y<piece.shape.length;y++) {
+
+    for(let x=0;x<piece.shape[y].length;x++) {
+
+      if(piece.shape[y][x]) {
+
+        board[r+y][c+x] = piece.color;
+
+        score += 10;
+
+      }
+
+    }
+
+  }
+
+  pieces[selected] = null;
+
+  selected = -1;
+
+  clearLines();
+
+  if(score>best) {
+
+    best = score;
+
+    localStorage.setItem(
+      "daffaBlockBest",
+      best
+    );
+
+  }
+
+  updateStats();
+
+  renderBoard();
+
+  if(pieces.every(p=>p===null)) {
+
+    newPieces();
+
+  } else {
+
+    renderPieces();
+
+  }
+
+  document.getElementById("message").textContent =
+    "Bagus! Terus kumpulkan skor tertinggi!";
+
+  checkGameOver();
+
+}
+
+function clearLines() {
+
+  let rows = [];
+  let cols = [];
+
+  for(let r=0;r<SIZE;r++) {
+
+    if(board[r].every(cell=>cell!==null)) {
+
+      rows.push(r);
+
+    }
+
+  }
+
+  for(let c=0;c<SIZE;c++) {
+
+    if(board.every(row=>row[c]!==null)) {
+
+      cols.push(c);
+
+    }
+
+  }
+
+  rows.forEach(r=>{
+
+    board[r] = Array(SIZE).fill(null);
+
+  });
+
+  cols.forEach(c=>{
+
+    for(let r=0;r<SIZE;r++) {
+
+      board[r][c] = null;
+
+    }
+
+  });
+
+  const cleared = rows.length+cols.length;
+
+  if(cleared>0) {
+
+    score += cleared*100;
+
+    if(cleared>=2) {
+
+      score += cleared*50;
+
+    }
+
+    document.getElementById("message").textContent =
+      "COMBO! "+cleared+" baris/kolom berhasil dihapus!";
+
+  }
+
+}
+
+function checkGameOver() {
+
+  const available = pieces.some(piece=>{
+
+    if(!piece) return false;
+
+    for(let r=0;r<SIZE;r++) {
+
+      for(let c=0;c<SIZE;c++) {
+
+        if(canPlace(piece.shape,r,c)) {
+
+          return true;
+
+        }
+
+      }
+
+    }
+
+    return false;
+
+  });
+
+  if(!available) {
+
+    document.getElementById("finalScore").textContent =
+      score;
+
+    document.getElementById("overlay")
+      .classList.add("show");
+
+  }
+
+}
+
+function updateStats() {
+
+  document.getElementById("score").textContent =
+    score;
+
+  document.getElementById("best").textContent =
+    best;
+
+}
+
+function restart() {
+
+  score = 0;
+
+  newBoard();
+
+  newPieces();
+
+  updateStats();
+
+  renderBoard();
+
+  document.getElementById("overlay")
+    .classList.remove("show");
+
+  document.getElementById("message").textContent =
+    "Game baru dimulai. Selamat bermain!";
+
+}
+
+restart();
+
+</script>
+
+</body>
+</html>
